@@ -1,0 +1,7 @@
+We analyzed the Cyclistic bike-share data made available by Motivate International Inc. under this (https://ride.divvybikes.com/data-license-agreement) license.
+
+import-data.R - imports csv file of 12 months of 2021, Cyclistic trip data to data directory. Then carried basic inspection of the datasets in the data directory.
+
+wrangle-data.R - creates a derived dataset and saves as R object in rda directory
+
+analyze-data.R - generates various analysis plots and saves it to the figs directory

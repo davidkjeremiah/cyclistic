@@ -1,0 +1,1228 @@
+---
+title: "Cyclistic Bikeshare Project"
+author: "David Jeremiah"
+date: '2022-07-12'
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Background for Use Case
+
+This is a report on how casual riders and annual members use Cyclistic bikes differently - a fictional bike-share company in Chicago. The director of marketing, Moreno, believes the company’s future success depends on maximizing the number of annual memberships. 
+
+From understanding how casual riders and annual members vary in their use of Cyclistic bikes, the marketing team can design a new marketing strategy to convert casual riders into annual members.
+
+The original data was obtained from: [divvy-tripdata](https://divvy-tripdata.s3.amazonaws.com/index.html)
+
+
+## Step 1: Setting up my environment
+
+Notes: setting up my R environment by loading the needed packages
+
+```{r loading packages}
+library(tidyverse)
+library(skimr)
+library(ggplot2)
+library(assertive)
+library(lubridate)
+```
+
+
+## Step 2: Importing and Viewing file
+
+Notes: Using a sample from the entire file: *202101-divvy-tripdata*, for inspection
+
+```{r Generating path to file:, include=FALSE}
+file_path <- paste(getwd(), sep ="", c("/data/202101-divvy-tripdata.csv"))
+```
+```{r Confirm that file exist in current working directory, include=FALSE}
+print(file.exists(file_path))
+```
+```{r read file in CSV format, include=FALSE}
+sub_cylistic_data <- read_csv("C:/Users/David Jerry/Downloads/202101-divvy-tripdata.csv")
+```
+```{r Inspecting data}
+print(head(sub_cylistic_data))
+print(skim_without_charts(sub_cylistic_data))
+```
+
+Notes: 
+
+1. Our data is made up majorly of two variable types: *character* and *numeric*.
+
+2. Considering the n_unique summary of the character variables, 
+it seems rideable_type and user_type are best as factors. 
+
+3. We learn that there are infact, three possible rideable_types: 'classic_bike', 'docked_bike', and  'electric_bike'. And for usertype, there are infact two possible Cyclistic user type: 'casual', and 'member'.
+
+4. There are missing values in our sample dataset. This is likely to be the same for the remain years: *202102 - 202112 of divvy_trip_data*
+           
+5. started_at and ended_at variables are declared as 'character' variable,
+instead of DATETIME.
+
+So, there are few issues in our data in need of wrangling.
+
+
+## Step 3: Import complete wrangled dataset
+
+Notes: spent some time working with and carrying out Data wrangling techniques on the individual spreadsheets. Then, imported each dataset and assigned them to individual variables: *divvy_tripdata_1 - divvy_tripdata_12*
+
+```{r Import each dataset and assigning them to individual variables, include=FALSE}
+divvy_tripdata_1 <- read_csv(paste(getwd(), sep ="", c("/data/202101-divvy-tripdata.csv")))
+divvy_tripdata_2 <- read_csv(paste(getwd(), sep ="", c("/data/202102-divvy-tripdata.csv")))
+divvy_tripdata_3 <- read_csv(paste(getwd(), sep ="", c("/data/202103-divvy-tripdata.csv")))
+divvy_tripdata_4 <- read_csv(paste(getwd(), sep ="", c("/data/202104-divvy-tripdata.csv")))
+divvy_tripdata_5 <- read_csv(paste(getwd(), sep ="", c("/data/202105-divvy-tripdata.csv")))
+divvy_tripdata_6 <- read_csv(paste(getwd(), sep ="", c("/data/202106-divvy-tripdata.csv")))
+divvy_tripdata_7 <- read_csv(paste(getwd(), sep ="", c("/data/202107-divvy-tripdata.csv")))
+divvy_tripdata_8 <- read_csv(paste(getwd(), sep ="", c("/data/202108-divvy-tripdata.csv")))
+divvy_tripdata_9 <- read_csv(paste(getwd(), sep ="", c("/data/202109-divvy-tripdata.csv")))
+divvy_tripdata_10 <- read_csv(paste(getwd(), sep ="", c("/data/202110-divvy-tripdata.csv")))
+divvy_tripdata_11 <- read_csv(paste(getwd(), sep ="", c("/data/202111-divvy-tripdata.csv")))
+divvy_tripdata_12 <- read_csv(paste(getwd(), sep ="", c("/data/202112-divvy-tripdata.csv")))
+```
+
+
+## Step 4: Select needed columns for project
+
+Here, we select the needed features for our project.
+
+Notes: The following are the features we need for our casestudy:
+
+* RIDE_ID
+* RIDEABLE_TYPE
+* USERTYPE
+* START_DATE
+* END_DATE
+* START_TIME
+* END_TIME
+* START_STATION_NAME
+* END_STATION_NAME
+* RIDE_LENGTH
+* WEEK_DAY
+
+
+```{r For divvy_tripdata_1, include=FALSE}
+divvy_tripdata_1 <- divvy_tripdata_1 %>% select(RIDE_ID, 
+                                                USERTYPE,
+                                                RIDEABLE_TYPE,
+                                                START_DATE,
+                                                END_DATE,
+                                                START_TIME,
+                                                END_TIME,
+                                                START_STATION_NAME,
+                                                END_STATION_NAME,
+                                                RIDE_LENGTH,
+                                                WEEK_DAY)
+
+```
+```{r For divvy_tripdata_2, include=FALSE}
+divvy_tripdata_2 <- divvy_tripdata_2 %>% select(RIDE_ID, 
+                                                USERTYPE,
+                                                RIDEABLE_TYPE,
+                                                START_DATE,
+                                                END_DATE,
+                                                START_TIME,
+                                                END_TIME,
+                                                START_STATION_NAME,
+                                                END_STATION_NAME,
+                                                RIDE_LENGTH,
+                                                WEEK_DAY)
+
+```
+```{r For divvy_tripdata_3, include=FALSE}
+divvy_tripdata_3 <- divvy_tripdata_3 %>% select(RIDE_ID, 
+                                                USERTYPE,
+                                                RIDEABLE_TYPE,
+                                                START_DATE,
+                                                END_DATE,
+                                                START_TIME,
+                                                END_TIME,
+                                                START_STATION_NAME,
+                                                END_STATION_NAME,
+                                                RIDE_LENGTH,
+                                                WEEK_DAY)
+
+```
+```{r For divvy_tripdata_4, include=FALSE}
+divvy_tripdata_4 <- divvy_tripdata_4 %>% select(RIDE_ID, 
+                                                USERTYPE,
+                                                RIDEABLE_TYPE,
+                                                START_DATE,
+                                                END_DATE,
+                                                START_TIME,
+                                                END_TIME,
+                                                START_STATION_NAME,
+                                                END_STATION_NAME,
+                                                RIDE_LENGTH,
+                                                WEEK_DAY)
+
+```
+```{r For divvy_tripdata_5, include=FALSE}
+divvy_tripdata_5 <- divvy_tripdata_5 %>% select(RIDE_ID, 
+                                                USERTYPE,
+                                                RIDEABLE_TYPE,
+                                                START_DATE,
+                                                END_DATE,
+                                                START_TIME,
+                                                END_TIME,
+                                                START_STATION_NAME,
+                                                END_STATION_NAME,
+                                                RIDE_LENGTH,
+                                                WEEK_DAY)
+
+```
+```{r For divvy_tripdata_6, include=FALSE}
+divvy_tripdata_6 <- divvy_tripdata_6 %>% select(RIDE_ID, 
+                                                USERTYPE,
+                                                RIDEABLE_TYPE,
+                                                START_DATE,
+                                                END_DATE,
+                                                START_TIME,
+                                                END_TIME,
+                                                START_STATION_NAME,
+                                                END_STATION_NAME,
+                                                RIDE_LENGTH,
+                                                WEEK_DAY)
+
+```
+```{r For divvy_tripdata_7, include=FALSE}
+divvy_tripdata_7 <- divvy_tripdata_7 %>% select(RIDE_ID, 
+                                                USERTYPE,
+                                                RIDEABLE_TYPE,
+                                                START_DATE,
+                                                END_DATE,
+                                                START_TIME,
+                                                END_TIME,
+                                                START_STATION_NAME,
+                                                END_STATION_NAME,
+                                                RIDE_LENGTH,
+                                                WEEK_DAY)
+
+```
+```{r For divvy_tripdata_8, include=FALSE}
+divvy_tripdata_8 <- divvy_tripdata_8 %>% select(RIDE_ID, 
+                                                USERTYPE,
+                                                RIDEABLE_TYPE,
+                                                START_DATE,
+                                                END_DATE,
+                                                START_TIME,
+                                                END_TIME,
+                                                START_STATION_NAME,
+                                                END_STATION_NAME,
+                                                RIDE_LENGTH,
+                                                WEEK_DAY)
+
+```
+```{r For divvy_tripdata_9, include=FALSE}
+divvy_tripdata_9 <- divvy_tripdata_9 %>% select(RIDE_ID, 
+                                                USERTYPE,
+                                                RIDEABLE_TYPE,
+                                                START_DATE,
+                                                END_DATE,
+                                                START_TIME,
+                                                END_TIME,
+                                                START_STATION_NAME,
+                                                END_STATION_NAME,
+                                                RIDE_LENGTH,
+                                                WEEK_DAY)
+
+```
+```{r For divvy_tripdata_10, include=FALSE}
+divvy_tripdata_10 <- divvy_tripdata_10 %>% select(RIDE_ID, 
+                                                USERTYPE,
+                                                RIDEABLE_TYPE,
+                                                START_DATE,
+                                                END_DATE,
+                                                START_TIME,
+                                                END_TIME,
+                                                START_STATION_NAME,
+                                                END_STATION_NAME,
+                                                RIDE_LENGTH,
+                                                WEEK_DAY)
+
+```
+```{r For divvy_tripdata_11, include=FALSE}
+divvy_tripdata_11 <- divvy_tripdata_11 %>% select(RIDE_ID, 
+                                                USERTYPE,
+                                                RIDEABLE_TYPE,
+                                                START_DATE,
+                                                END_DATE,
+                                                START_TIME,
+                                                END_TIME,
+                                                START_STATION_NAME,
+                                                END_STATION_NAME,
+                                                RIDE_LENGTH,
+                                                WEEK_DAY)
+
+```
+```{r For divvy_tripdata_12, include=FALSE}
+divvy_tripdata_12 <- divvy_tripdata_12 %>% select(RIDE_ID, 
+                                                USERTYPE,
+                                                RIDEABLE_TYPE,
+                                                START_DATE,
+                                                END_DATE,
+                                                START_TIME,
+                                                END_TIME,
+                                                START_STATION_NAME,
+                                                END_STATION_NAME,
+                                                RIDE_LENGTH,
+                                                WEEK_DAY)
+
+```
+                                               
+
+                                                  
+## Step 5: Merge Individual Spreadsheets into Full-year view
+
+Here, we merge the wrangled individual spreadsheets into a full-year view for further analysis.
+
+```{r Unite the datasets into one full-year view for further analysis}
+full_dataset <- rbind(divvy_tripdata_1, divvy_tripdata_2, divvy_tripdata_3, 
+                      divvy_tripdata_4, divvy_tripdata_5, divvy_tripdata_6,
+                      divvy_tripdata_7, divvy_tripdata_8, divvy_tripdata_9,
+                      divvy_tripdata_10, divvy_tripdata_11, divvy_tripdata_12)
+```
+
+
+
+## Step 6i: Exploring Categorical data: USERTYPE count
+
+Here, we make a count of the number of Casual riders against Annual members
+
+```{r Counting the number of Casual riders against annual members}
+options(digits = 3)
+perc_usertype <- full_dataset %>% 
+  summarize(percent_casual = mean(USERTYPE == "casual"),
+            percent_annual = mean(USERTYPE == "member"))
+
+print(sum(table(full_dataset$USERTYPE)))
+print(perc_usertype)
+```
+
+Notes: From the table, we see that Cyclistic bike_share company have a total of 5,595,063 users for the year, 2021, with more of annual members than casuals. Where 54.8 % are Annuals, 45.2% are Casuals.
+  
+The goal of Moreno, the director of marketing at Cyclistic, is to convert these **45.2%** to annuals. 
+
+
+## Visualizations
+
+Here we would go through a series of visualizations
+
+```{r 1. Comparing the proportions of usertypes by month, include=FALSE}
+perc_usertype_by_month <- full_dataset %>% 
+  group_by(month(START_DATE)) %>% 
+  summarize(percent_casual = mean(USERTYPE == "casual"),
+            percent_annual = mean(USERTYPE == "member"))
+
+print(perc_usertype_by_month %>% arrange(-percent_annual))
+```
+
+
+
+### Percent_annual per Month
+
+Here, we visualize percentage of annual members for each month
+
+```{r Line plot visualizing percentage of annual members for each month}
+print(perc_usertype_by_month %>% 
+        ggplot(aes(x = `month(START_DATE)`, y = percent_annual * 100)) + 
+        geom_point() + 
+        geom_smooth() +
+        labs(title= 'Percent_annual vs Month', x = "Month") + 
+        theme_minimal())
+```
+
+
+
+### Percent_casual per Month
+
+Here, we visualize percentage of casual members for each month
+
+```{r Line plot visualizing percentage of casual members for each month}
+print(perc_usertype_by_month %>% 
+        ggplot(aes(x = `month(START_DATE)`, y = percent_casual * 100)) + 
+        geom_point() + 
+        geom_smooth() + 
+        labs(title= 'Percent_casual vs Month', x = "Month") +
+        theme_minimal())
+```
+
+
+
+### Proportion of Annuals and Casuals per Month
+
+Here, we visualize percentage of annual and casual members for each month
+
+```{r Bar plot showing proportions of Annuals and Casuals per month}
+print(full_dataset %>% 
+        ggplot(aes(x = month(START_DATE, label= TRUE), 
+                   fill = USERTYPE)) + 
+        geom_bar(position = "fill") +
+        labs(title = "Proportions of Cyclistic Usertype per Month", 
+             x = "Month", y = "Prop") +
+        theme_minimal())
+```
+
+
+Notes:  
+
+* From our result, we see that between September and May (i.e during autumn, winter, and spring seasons), Cyclistic bike-share system has highest percentage (> 50%) - i.e. highest number - of Annual members than Casuals.
+
+* We also see that the highest number of annuals, are in the month of January. With the lowest being in the month of July. For Casuals, it was vice versa.
+
+
+
+Next, let's compare the proportions of Annuals and Casuals by week_day. 
+
+Note: weeks days count from Sunday (1) - Saturday (7)
+
+```{r 2. Comparing the proportions of usertypes by week day, include=FALSE}
+perc_usertype_by_day <- full_dataset %>% 
+  group_by(WEEK_DAY) %>% 
+  summarize(percent_casual = mean(USERTYPE == "casual"),
+            percent_annual = mean(USERTYPE == "member"))
+
+print(perc_usertype_by_day %>% arrange(-percent_annual))
+```
+
+
+
+### Percent_annual per Week day
+
+Here, we visualize percentage of annual members for each Week Day
+
+```{r Line plot visualizing percentage of annual members for each week_day}
+print(perc_usertype_by_day %>% 
+        ggplot(aes(x = WEEK_DAY, y = percent_annual * 100)) + 
+        geom_point() + 
+        geom_smooth() +
+        labs(title= 'Percent_annual vs Week Day', x = "Week Day") + 
+        theme_minimal())
+```
+
+
+
+### Percent_casual per Week day
+
+Here, we visualize percentage of casual members for each Week Day
+
+```{r Line plot visualizing percentage of casual members for each week_day}
+print(perc_usertype_by_day %>% 
+        ggplot(aes(x = WEEK_DAY, y = percent_casual * 100)) + 
+        geom_point() + 
+        geom_smooth() + 
+        labs(title= 'Percent_casual vs Week Day', x = "Week Day") +
+        theme_minimal())
+```
+
+
+
+### Proportion of Annuals and Casuals per Week Day
+
+Here, we visualize percentage of annual and casual members for each week_day
+
+```{r Bar plot showing proportions of Annuals and Casuals per week_day}
+print(full_dataset %>% 
+        ggplot(aes(x = wday(WEEK_DAY, label= TRUE), 
+                   fill = USERTYPE)) + 
+        geom_bar(position = "fill") +
+        labs(title = "Proportions of Cyclistic Usertype per Week", 
+             x = "Week Day", y = "Prop") +
+        theme_minimal())
+```
+
+
+
+Notes:  
+
+From our result, we see that for each month, during the weekends (Sundays and Saturdays), Casuals patronize Cyclistic more (> 50%). Annuals, on the other hand, patronize more during the business days: Monday - Friday (> 50%). 
+
+
+    This suggests that most annual members use Cylistic bikes to commute to
+    work. Their peak patronage days being Tuesdays and Wednesdays. While most
+    Casual use Cylistic bikes mostly for leisure or recreational activities,
+    with peak patronage occurring in the weekends.
+    
+    Furthermore, this goes on to highlight the reason why Annuals are highest
+    in January, as shown by our earliest plot of "Proportions of Cyclistic
+    Usertype per Month." This is possibly due to the start of a New year, with
+    majority of workers back from the holiday vacation, plus new hiring by
+    companies taking place.
+    
+    For Casuals high number in July. This is probably due to the summer
+    vacation (as one factor), with students typically finishing the school
+    year between late-May and late-June, and starting the new year between
+    early-August and early-September. 
+    
+    Perhaps, the number of Casual patronage of Cyclistic bikes during summer
+    seasons are by students on break and mostly for leisure.
+
+
+
+
+Next, let's compare the proportions of Annuals and Casuals by both month and week_day
+
+```{r 3. Comparing usertypes by both month and week_day, include=FALSE}
+perc_usertype_by_month_day <- full_dataset %>% 
+  group_by(month(START_DATE), WEEK_DAY) %>% 
+  summarize(percent_casual = mean(USERTYPE == "casual"),
+            percent_annual = mean(USERTYPE == "member"))
+
+print(perc_usertype_by_month_day)
+```
+
+
+
+
+### Percent_annual for the Months and Days
+
+Here, we visualize percentage of annual members for each Month and Day.
+
+```{r Line plot showing trend for EACH month and week-day for percent_annual}
+print(perc_usertype_by_month_day %>% 
+        ggplot(aes(x = WEEK_DAY, 
+                   y = percent_annual)) +
+        geom_line() + 
+        ggtitle(label = "Percentage of Annual members for each Month and Day") +
+        facet_wrap(~ month(`month(START_DATE)`, label = TRUE)) +
+        theme_minimal())
+```
+
+
+
+
+### Percent_casual per the Months and Days
+
+Here, we visualize percentage of casual members for each Month and Day
+
+```{r Line plot visualizing percentage of casual members for each Month and week_day}
+print(perc_usertype_by_month_day %>% 
+        ggplot(aes(x = WEEK_DAY, 
+                   y = percent_casual)) +
+        geom_line() + 
+        ggtitle(label = "Percentage of Casual members for each Month and Day") +
+        facet_wrap(~ month(`month(START_DATE)`, label = TRUE)) +
+        theme_minimal())
+```
+
+
+Notes:  
+
+* Generally, for casuals, they patronize Cyclistic bikes more, in all the months of the year, during weekends than on working days. And this is at its peak as they approach Summer: June, July, and August.
+  
+* For Annuals, they patronize Cyclistic bikes more in all the months during working days than on weekends. And this dwindles as they approach summer but picks up during Winter, Spring and Autumn seasons.
+
+
+
+
+## Step 6ii: Exploring Categorical data: USERTYPE vs RIDEABLE_TYPE
+
+Here, we check the types of bikes commonly used by Casual or Annual members
+
+```{r Comparing categorical variables USERTYPE and RIDEABLE_TYPE using contingency table}
+tb_cnt_ut_rt <- table(full_dataset$RIDEABLE_TYPE, full_dataset$USERTYPE)
+print(prop.table(tb_cnt_ut_rt, 1))
+```
+
+
+## Visualizations
+
+Here we would go through a series of visualizations
+
+```{r Checking for common Cyclistic Bike_types used in February}
+print(full_dataset %>% 
+        filter(month(START_DATE) == 02) %>% 
+        ggplot(aes(x = USERTYPE, fill = USERTYPE)) + 
+        geom_bar(position = "dodge") + 
+        labs(title = "Common Cyclistic Bike_types used in February", x = "usertype") + 
+        scale_y_continuous(trans = "log2") +
+        facet_wrap(~RIDEABLE_TYPE) +
+        theme_minimal())
+```
+
+Notes: We already know that there are infact three possible rideable types: **'classic_bike'**, **'docked_bike'**, and  **'electric_bike'** in our dataset. 
+
+So, first, the analysis tells us that the most common bike used by both types of riders - Annuals and Casuals - are classic bikes. 
+
+However, when comparing by proportions, classic_bikes are used more by annual members than by casual members: **61% vs 39%.**
+
+The next bike commonly used are electric bikes, with annual member using more of it than casual members: **53.2% vs 46.8%**
+
+Interestingly, more casual users than annual members opt for docked bikes (**100% vs < 0.05%**). It seems as though hardly do annuals used these types of bikes. However, note that, Casuals use docked bikes less, compared to the other types of Cyclistic bikes.
+
+
+    Note: With this summary, since a large proportion of Annuals use cyclistic
+    bikes to commute to work, it translates to mean a large percentage of
+    classic and electric bikes used by Annuals, are for work purposes, than
+    for recreational purposes.
+
+    In the same way, since a large proportion of Casuals use cyclistic bikes
+    for leisure, it translates to mean large percentage of classic, electric,
+    and docked bikes used by Casuals, are for recreational purposes, than for
+    work purposes.
+  
+Questions to consider:  
+
+* Which bikes is preferred more by Casuals for recreational purpose?
+* Which bikes is preferred more by Annuals for recreational purpose?
+  
+
+
+
+### Facet by rideable_type and month 
+
+Apparently, our analysis holds true for 10 months from December. Let's see if that's the case in the eleventh month, by comparing February with November
+
+
+```{r Counting common Cyclistic bike_type used in Feb and Nov}
+print(full_dataset %>% 
+        filter(month(START_DATE) %in% c(02, 11)) %>% 
+        ggplot(aes(x = USERTYPE, fill = USERTYPE)) + 
+        geom_bar(position = "dodge") + 
+        labs(title = "Count of Cyclistic Bike_types used in Feb and Nov",
+             y = "Count") +
+        facet_grid(month(START_DATE, label = TRUE) ~ RIDEABLE_TYPE) + 
+        scale_y_continuous(trans = 'log2') +
+        theme_minimal())
+```
+
+
+Notes: From our plot, we find that while majority of Casuals have increased in their use of classic and electric bikes over the months from February. Yet, Annuals subscribe for it more. 
+
+We also see that Casuals have maintained an increase use of docked bikes over the months.
+
+
+```{r Checking the types of bikes commonly used in each month, include=FALSE}
+bike_used_per_month <- full_dataset %>% 
+  group_by(month(START_DATE)) %>% 
+  summarize(percent_classic = mean(RIDEABLE_TYPE == "classic_bike"),
+            percent_docked = mean(RIDEABLE_TYPE == "docked_bike"),
+            percent_electric = mean(RIDEABLE_TYPE == "electric_bike"))
+
+print(bike_used_per_month %>% arrange(-percent_classic))
+print(bike_used_per_month %>% arrange(-percent_docked))
+print(bike_used_per_month %>% arrange(-percent_electric))
+```
+
+
+```{r Line plot showing trend of how classic bikes were used per month }
+print(bike_used_per_month %>% 
+        ggplot(aes(x = `month(START_DATE)`, y = percent_classic * 100)) +
+        geom_point() + 
+        geom_smooth() +
+        labs(title = "Trend of classic bike usage per month", 
+             x = "Month", y = "Percent") +
+        theme_minimal())
+```
+```{r Line plot showing trend of how docked bikes were used per month}
+print(bike_used_per_month %>% 
+        ggplot(aes(x = `month(START_DATE)`, y = percent_docked * 100)) +
+        geom_point() + 
+        geom_smooth() +
+        labs(title = "Trend of docked bike usage per month", 
+             x = "Month", y = "Percent") +
+        theme_minimal())
+```
+```{r Line plot showing trend of how electric bikes were used per month}
+print(bike_used_per_month %>% 
+        ggplot(aes(x = `month(START_DATE)`, y = percent_electric * 100)) +
+        geom_point() + 
+        geom_smooth() +
+        labs(title = "Trend of electric bike usage per month", 
+             x = "Month", y = "Percent") +
+        theme_minimal())
+```
+
+
+Notes: According to our plot, in the beginning of the year (during the first 8 months, which includes the summer vacation months), classic bikes are used more than any other type of Cyclistic bikes. And towards the end of the year (after the first 8 months), electric bikes are the ones being used more.
+  
+    A. This shows that there is a linear relationship between the use 
+    of classic bikes and electric bikes across the months of the year.
+    (Check out the scatter plot below to confirm this)
+    
+    B. This also shows that both Annuals and Casuals prefer to use Classic
+    bikes in the first 8 months of the year than electric bikes.
+    However, there are some casuals that opt for docked bikes instead.
+    
+Questions to consider:
+
+1. What factors influence this trend for Casuals - their choice of bikes in these months: Time Availability of Bikes, Stations of Bikes, Speed of Bikes, Seasons??
+
+
+Docked bikes are used more, together with classic bikes somewhere in the beginning and middle of the year - between March and August.
+
+    c. This shows that Casual riders prefer to use more of Classic bikes
+    and Docked bikes for recreational purposes during the winter, spring, and
+    summer seasosn. And giving that their use of classic bikes is greater than
+    docked bikes, we can say they seem to prefer to ride classic bikes, during
+    these periods for leisure.
+    
+
+    
+### Scatter plot 
+
+Here, we visualize a scatter plot showing the linear relationship between classic bike and annual bike usage
+
+
+```{r Regression for Electric bikes on Classic Bikes}
+print(bike_used_per_month %>% 
+        ggplot(aes(x = percent_electric, 
+                   y = percent_classic)) + 
+        geom_point() + 
+        geom_smooth(method = lm) +
+        labs(title = "Regression for Electric bikes on Classic Bikes") +
+        theme_minimal())
+```
+
+
+Notes: From our plot, we see a negative linear relationship between the use of classic bikes and electric bikes across the year. 
+
+We see that as the use of classic bikes decreases in their patronage across the year, the use of electric bikes increases.
+  
+Question to consider: 
+
+* WHY is there a negative linear relationship between classic bikes and electric bikes across the months of the year?
+
+
+
+
+Now, let's check common bikes used per day_of_week
+
+```{r Checking the types of bikes commonly used on which week_day, include=FALSE}
+bike_used_per_day <- full_dataset %>% 
+  group_by(WEEK_DAY) %>% 
+  summarize(percent_classic = mean(RIDEABLE_TYPE == "classic_bike"),
+            percent_docked = mean(RIDEABLE_TYPE == "docked_bike"),
+            percent_electric = mean(RIDEABLE_TYPE == "electric_bike"))
+
+print(bike_used_per_day)
+```
+
+
+```{r Line plot showing trend of how classic bikes were used per week_day}
+print(bike_used_per_day %>% 
+        ggplot(aes(x = WEEK_DAY, y = percent_classic * 100)) +
+        geom_line() + 
+        labs(title = "Trend of classic bike usage per day", 
+             x = "Week Day", y = "Percent") +
+        theme_minimal())
+```
+```{r Line plot showing trend of how docked bikes were used per week_day}
+print(bike_used_per_day %>% 
+        ggplot(aes(x = WEEK_DAY, y = percent_docked * 100)) +
+        geom_line() +
+        labs(title = "Trend of docked bike usage per day", 
+             x = "Week Day", y = "Percent") +
+        theme_minimal())
+```
+```{r Line plot showing trend of how electric bikes were used per week_day}
+print(bike_used_per_day %>% 
+        ggplot(aes(x = WEEK_DAY, y = percent_electric * 100)) +
+        geom_line() +
+        labs(title = "Trend of electric bike usage per day", 
+             x = "Week Day", y = "Percent") +
+        theme_minimal())
+```
+
+
+
+
+Now, let check the types of bikes commonly used in each months and week_day
+
+```{r Checking the types of bikes commonly used in each months and week_day, include=FALSE}
+bike_used_per_month_day <- full_dataset %>% 
+  group_by(month(START_DATE), WEEK_DAY) %>% 
+  summarize(percent_classic = mean(RIDEABLE_TYPE == "classic_bike"),
+            percent_docked = mean(RIDEABLE_TYPE == "docked_bike"),
+            percent_electric = mean(RIDEABLE_TYPE == "electric_bike"))
+
+print(bike_used_per_month_day)
+```
+
+
+```{r Line plot showing trend of use of classic bikes in each month and week day}
+print(bike_used_per_month_day %>% 
+        ggplot(aes(x = WEEK_DAY, 
+                   y = percent_classic)) +
+        geom_line() + 
+        ggtitle(label = "Percentage of classic bikes used in each month and week-day") +
+        facet_wrap(~ month(`month(START_DATE)`, label = TRUE)) +
+        theme_minimal())
+```
+```{r Line plot showing trend of use of docked bikes in each month and week day}
+print(bike_used_per_month_day %>% 
+        ggplot(aes(x = WEEK_DAY, 
+                   y = percent_docked)) + 
+        geom_line() + 
+        ggtitle(label = "Percentage of docked bikes used in each month and week-day") +
+        facet_wrap(~ month(`month(START_DATE)`, label = TRUE)) +
+        theme_minimal())
+```
+```{r Line plot showing trend of use of electric bikes in each month and week day}
+print(bike_used_per_month_day %>% 
+        ggplot(aes(x = WEEK_DAY, 
+                   y = percent_electric)) +
+        geom_line() + 
+        ggtitle(label = "Percentage of electric bikes used in each month and week-day") +
+        facet_wrap(~ month(`month(START_DATE)`, label = TRUE)) +
+        theme_minimal())
+```
+
+
+
+
+Notes: 
+
+In General, considering the first and last days, classic_bikes are used more on weekends than business days. Although, when compared to other bike types, it is used during the business days more. And they are patronized more from the Winter to Summer Season.
+
+Docked bikes, for all the months, are also used more during weekends than business days. However, they are patronized in high proportion, from the Spring entering into the Summer season.
+
+Electric bikes, however are used less during the weekends, but more during business days. And they are being sort after and use as we approach the holidays.
+
+
+
+
+
+## Step 7: Exploring Numerical data
+
+### Descriptive Statistical Analysis
+
+Here, we group by USERTYPE, and calculate the mean, maximum value, minimum_value, median, standard_deviation, mode, and IQR of RIDE_LENGTH feature
+
+```{r Create the mode function, include=FALSE}
+mode <- function(v, na.rm = TRUE) {
+  uniqv <- unique(v)
+  uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+```
+
+```{r Summary: Relationship between USERTYPE and RIDE_LENGTH}
+summary_user_ridelengths <- full_dataset %>%
+  group_by(USERTYPE) %>%
+  summarize(count = n(), 
+            mean = mean(RIDE_LENGTH, na.rm = TRUE),
+            std_dev = sd(RIDE_LENGTH, na.rm = TRUE), 
+            min = min(RIDE_LENGTH, na.rm = TRUE), 
+            median = median(RIDE_LENGTH, na.rm=TRUE),
+            mode = mode(RIDE_LENGTH, na.rm= TRUE),
+            iqr = IQR(RIDE_LENGTH, na.rm = TRUE), 
+            max = max(RIDE_LENGTH, na.rm = TRUE))
+
+print(summary_user_ridelengths)
+```
+
+
+
+### Average ride_length for members and casual riders
+
+Here, we visualize the average ride_length for members and casual riders
+
+```{r Bar plot showing average ride_length for each usertype}
+print(summary_user_ridelengths %>% 
+        ggplot(aes(x= USERTYPE, y=as.numeric(mean), fill=USERTYPE)) + 
+        geom_col() + 
+        labs(title = "Average of ride_length vs Usertype", 
+             x = "Usertype", 
+             y = "Avg of Ride length (mins)") +
+        theme_minimal())
+```
+
+
+Notes:
+
+1. From the table, we reaffirm that we have more annual members than casual members.
+
+2. However, on average, casual members ride for longer hours/mins than annual members: 32 mins vs 13.6 mins
+
+3. In summary the highest ride_lengths (in mins for 2021) are from casual members (55,944 mins) compared to annual members (1,560 mins).
+
+4. Also, the most common ride_lengths for casual members per day is 8 mins on average. For annuals, it's 5 mins.
+     
+Questions to consider: 
+
+* What could be the reason casuals ride for long mins/hours and Annuals ride for less?
+
+* What factors influence the long rides for Casuals and short rides for Annuals?
+
+* Could it be as a result of Season/Weather of the year, far distance to cover, type of activity they do, type of ride? 
+
+* Does the day of the week impact the length of ride?
+
+* Does the month impact the length of ride?
+
+* Does the same factor affect annual members?
+
+
+
+### Average ride_length for users by Month.
+
+Here, we calculate and visualize the average ride_length for users by Month.
+
+```{r Calculate the average ride_length for users by Month, include=FALSE}
+avg_ridelength_by_month <- full_dataset %>% 
+  group_by(USERTYPE, month(START_DATE)) %>% 
+  summarize(mean = mean(RIDE_LENGTH, na.rm = TRUE)) %>% 
+  arrange(USERTYPE, -mean)
+
+print(avg_ridelength_by_month)
+```
+
+
+```{r Bar plot showing average ride length for users by month}
+print(avg_ridelength_by_month %>% 
+        ggplot(aes(x = month(`month(START_DATE)`, label = TRUE), 
+                   y = mean, 
+                   fill = USERTYPE)) + 
+        geom_col() +
+        labs(title = "Average Ride Length for Users by Month",
+             x = "Month", 
+             y = "Average Ride Length") +
+        theme_minimal())
+```
+
+
+
+Notes: 
+
+1. From the graph, it's clear that casuals ride longer hours/mins than Annuals all through the year. Annuals tend to have shorter and steady rides.
+
+2. We also notice that Casuals and Annuals highest rides between February up until October, where it begins to decline as we enter the holiday periods: November - January. This is predominantly the winter seasons.
+
+    So, evidently, the weather condition influences the length of rides for
+    both users. Giving that the weather during the winter season is general
+    windy, cold, and frozen, many users would choose to use alternate transit
+    than bikes. Hence, the reduction in ride_lengths during these months.
+
+    But as the winter ends (somewhere in February), and we approach the
+    spring, summer, and autumn seasons, which have more pleasant weather
+    conditions (in comparison to the Winter) for bike riding.
+
+In general, many people are inspired to use cyclistic bike share system under pleasant expected weather conditions.
+
+
+
+### Average ride_length for users by day_of_week
+
+Here, we calculate and visualize the average ride_length for users by Day of Week
+
+```{r Calculate the average ride_length for users by day_of_week, include=FALSE}
+avg_ridelength_by_wday <- full_dataset %>% 
+  group_by(USERTYPE, WEEK_DAY) %>% 
+  summarize(mean = mean(RIDE_LENGTH, na.rm = TRUE)) %>% 
+  arrange(USERTYPE, -mean)
+
+print(avg_ridelength_by_wday)
+```
+
+
+```{r Bar plot showing ride_length for each user by week_day}
+print(avg_ridelength_by_wday %>% 
+        ggplot(aes(x = wday(WEEK_DAY, label = TRUE), 
+                   y = mean, 
+                   fill = USERTYPE)) + 
+        geom_col() + 
+        labs(title = "Average Ride Length for Users by Week_Day",
+             x = "Week Day", y = "Average Ride Length") +
+        theme_minimal())
+```
+
+
+Notes: 
+
+1. For casual members, they ride more during the weekends: Saturday's and Sunday's. And this appears to be the same for annuals members. In other words, there are more rides during the weekends than the business days.
+
+2. The day with the lowest ride_length for each usertype are the business days. However, when you compare Casual ride_lengths on working days, they are still higher than Annuals.
+
+    Note: Considering that majority of Casuals use Cyclistic bikes for leisure
+    or recreational purposes than simply commuting to work as the Annuals,
+    hence it explains why they have longer ride_lengths than Annuals - whose
+    ride-length are steady and shorter - during the working days. 
+
+In general, bikes used for recreational activities have lesser time constraints, than when used simply to punch a timeline as it is with those commuting strictly to work.
+
+
+
+
+
+Now let's see if there is a relationship between type of rides and ride length
+
+
+### Relationship between type of rides and ride length
+
+Here, we calculate and visualize the average ride_length (mins) and observe how they differ between different "Rideable_type"
+
+```{r Calculating average ride_length by rideable_type, include=FALSE}
+avg_ridelength_by_ridetype <- full_dataset %>% 
+  group_by(RIDEABLE_TYPE) %>% 
+  summarize(AVG_RIDE_LENGTH = mean(as.numeric(RIDE_LENGTH), na.rm = T))
+```
+
+
+```{r Bar plot showing Average Ride-length for each bike type}
+print(avg_ridelength_by_ridetype %>% 
+        ggplot(aes(x = RIDEABLE_TYPE, y = AVG_RIDE_LENGTH)) +
+        geom_bar(fill = "#00BFC4", stat = "identity") + 
+        ggtitle("Average Ride_length by Ride_type") +
+        theme_minimal())
+```
+
+
+Notes: 
+
+1. From the table and plot, docked bikes have longer ride_lengths (81.5 mins) on average, compared to classic_bikes (19.9 mins), and electric_bikes (16 mins).
+
+    One would have assumed that docked_bike longer ride lengths are due to it
+    being used often by Casuals. But, giving that Docked bikes are used the
+    least by Casuals in comparison to Classic bikes based on our analysis
+    above, the result in the graph thus implies that this deals with the speed
+    of the bikes.
+
+From our plot, the fastest bike are electric bikes. Following closely behind it are classic bikes. And the slowest bikes are docked bikes. (Perhaps, docked bikes used by Cyclistic bike-share company are the traditional bikes, hence its low speed.)
+
+    In general, one of factors influencing longer ride_lengths with Casuals
+    and fewer with Annuals is: the bike_type speed.
+    
+    We already know that Annuals use more of Classic and Electric bikes.
+    Hence, giving that these two are fast-paced bikes, they commute to their
+    destination for less hour/min.
+    
+    On the other hand, giving that Casuals use more of classic_bikes and
+    docked_bikes, with much of their use during the first eight months of the
+    year, it explains why our plot shows long_bike lengths (for casuals)
+    during the first 8 months as well, compared to the last four months.
+
+
+
+```{r Bar Plot showing Average Ride-length for each bike type by Month}
+avg_ridelength_by_month_ridetype <- full_dataset %>% 
+  group_by(RIDEABLE_TYPE, month(START_DATE)) %>% 
+  summarize(AVG_RIDE_LENGTH = mean(as.numeric(RIDE_LENGTH), na.rm = T))
+
+print(avg_ridelength_by_month_ridetype %>%  
+        ggplot(aes(x = month(`month(START_DATE)`, label = TRUE), 
+                   y = AVG_RIDE_LENGTH, 
+                   fill = RIDEABLE_TYPE)) +
+        geom_col() +
+        labs(title = "Ride Length for Ride_type by Month",
+             x = "Week Day", y = "Average Ride Length") + 
+        theme_minimal())
+```
+
+
+Notes: Evidently, from our plot, docked_bikes are slower than Classic and Electric bikes.
+
+
+
+
+Now, let's see if there is a relationship between count of usertype and rideable_type by Cyclistic bike stations
+
+
+### Relationship between Usertype and Rideable_type by Station
+
+Here, we want to know if there a relationship between the count of Rideable_type available per station and the use of Rideable_type
+
+For example, We already know that Casual riders patronize docked bikes more than Annuals. 
+
+* Why is this the case?
+
+* Could it be there are more docked_bike near-by stations where casuals are located (as one is likely to rent a bike with the bike-share station nearest to him or her)?
+
+* Are annuals located closely to classic_bike and electric_bike stations. Does that influence why thy use more of these bikes, besides their speed, to commute to work faster?
+
+
+
+#### Determine the start stations with the highest number for each rideable_type
+
+```{r Create a subset containing the count of rideable_type by start_stations, include=FALSE}
+startstationame_by_ridetype <- full_dataset %>% 
+  filter(!is.na(START_STATION_NAME)) %>% 
+  group_by(RIDEABLE_TYPE, START_STATION_NAME) %>% 
+  summarize(count = n()) %>% 
+  arrange(-count)
+```
+
+```{r Filter for the first 20 start_stations having the highest count for classic_bikes}
+print(head(startstationame_by_ridetype %>% 
+             filter(RIDEABLE_TYPE == "classic_bike") %>%
+             mutate(START_STATION_NAME = reorder(START_STATION_NAME, count)), 20) %>% 
+        ggplot(aes(x = START_STATION_NAME, y = count, fill = RIDEABLE_TYPE)) +
+        geom_col(position = "stack") + 
+        coord_flip() +
+        ggtitle(label = "Highest Count of Classic bikes per Start Stations" ) +
+        theme_minimal())
+
+```
+
+```{r Filter for the first 20 start_stations having the highest count for docked_bikes}
+print(head(startstationame_by_ridetype %>% 
+             filter(RIDEABLE_TYPE == "docked_bike") %>%
+             mutate(START_STATION_NAME = reorder(START_STATION_NAME, count)), 20) %>% 
+        ggplot(aes(x = START_STATION_NAME, y = count, fill = RIDEABLE_TYPE)) +
+        geom_col(position = "stack") + 
+        coord_flip() + 
+        ggtitle(label = "Highest Count of Docked bikes per Start Stations" ) + 
+        theme_minimal())
+```
+
+```{r Filter for the first 20 start_stations having the highest count for electric_bikes}
+print(head(startstationame_by_ridetype %>% 
+             filter(RIDEABLE_TYPE == "electric_bike") %>%
+             mutate(START_STATION_NAME = reorder(START_STATION_NAME, count)), 20) %>% 
+        ggplot(aes(x = START_STATION_NAME, y = count, fill = RIDEABLE_TYPE)) +
+        geom_col(position = "stack") + 
+        coord_flip() + 
+        ggtitle(label = "Highest Count of Electric bikes per Start Stations" ) + 
+        theme_minimal())
+
+```
+
+
+
+Now, let's see if there is a relationship between number of user_type and Cyclistic bike start stations
+
+#### Determine the start stations with the highest number of casual or annual users
+
+```{r Create a subset containing the count user_type by start_stations, include=FALSE}
+startstationame_by_usertype <- full_dataset %>% 
+  filter(!is.na(START_STATION_NAME)) %>% 
+  group_by(USERTYPE, START_STATION_NAME) %>% 
+  summarize(count = n()) %>% 
+  arrange(-count)
+```
+
+```{r Filter for the first 20 start_stations having the highest count for casuals}
+print(head(startstationame_by_usertype %>% 
+             filter(USERTYPE == "casual") %>%  
+             mutate(START_STATION_NAME = reorder(START_STATION_NAME, count)), 20) %>% 
+        ggplot(aes(x = START_STATION_NAME, y = count, fill = USERTYPE)) + 
+        geom_col(position = "stack") + 
+        coord_flip() + 
+        ggtitle(label = "Highest Count of Casuals per Start Stations" ) + 
+        theme_minimal())
+```
+
+```{r Filter for the first 20 start_stations having the highest count for Annuals}
+print(head(startstationame_by_usertype %>% 
+             filter(USERTYPE == "member") %>%  
+             mutate(START_STATION_NAME = reorder(START_STATION_NAME, count)), 20) %>% 
+        ggplot(aes(x = START_STATION_NAME, y = count, fill = USERTYPE)) + 
+        geom_col(position = "stack") + 
+        coord_flip() +
+        ggtitle(label = "Highest Count of Annuals per Start Stations" ) + 
+        theme_minimal())
+```
+
+Notes: 
+
+1. From the result, the start_station with the highest count of classic_bikes, electric_bikes, and docked_bikes is **'Streeter Dr & Grand Ave'**
+
+2. We also observe, from the plots above, that by comparing the counts of Casuals per start stations, we see that majority of casuals (**> 20,000**) are located closely to start stations where they have high counts of docked bikes. For example, *Streeter Dr & Grand Ave*, *Millennium Park*, *Shedd Aquarium*, *Theather on the Lake*, etc.
+
+3. Similarly, we observe, from the plots above, that by comparing the counts of Annuals per start stations, we see that majority of Annuals (**> 20,000**) are located away from docked_bike start stations, but are found close to start stations with high counts of electric and classic bikes. For example, *Clark St & Elm St.*, *Wells St & Concord Ln*, *Kingsbury St & Kinzie St*, and *Wells St & Elm St*
+
+
+
+Now, let's consider end stations
+
+#### Determine the end stations with the highest number for each rideable_type
+
+```{r Create a subset containing the count rideable_type by end_stations, include=FALSE}
+endstationame_by_ridetype <- full_dataset %>% 
+  filter(!is.na(END_STATION_NAME)) %>% 
+  group_by(RIDEABLE_TYPE, END_STATION_NAME) %>% 
+  summarize(count = n()) %>% 
+  arrange(-count)
+```
+
+```{r Filter for the first 20 end_stations having the highest count for classic_bikes}
+print(head(endstationame_by_ridetype %>% 
+             filter(RIDEABLE_TYPE == "classic_bike") %>%  
+             mutate(END_STATION_NAME = reorder(END_STATION_NAME, count)), 20) %>% 
+        ggplot(aes(x = END_STATION_NAME, y = count, fill = RIDEABLE_TYPE)) + 
+        geom_col(position = "stack") + 
+        coord_flip() + 
+        ggtitle(label = "Highest Count of Classic bikes per End Stations" ) + 
+        theme_minimal())
+```
+
+```{r Filter for the first 20 end_stations having the highest count for docked_bikes}
+print(head(endstationame_by_ridetype %>% 
+             filter(RIDEABLE_TYPE == "docked_bike") %>%  
+             mutate(END_STATION_NAME = reorder(END_STATION_NAME, count)), 20) %>% 
+        ggplot(aes(x = END_STATION_NAME, y = count, fill = RIDEABLE_TYPE)) + 
+        geom_col(position = "stack") + 
+        coord_flip() +
+        ggtitle(label = "Highest Count of Docked bikes per End Stations" ) + 
+        theme_minimal())
+```
+
+```{r Filter for the first 20 end_stations having the highest count for electric_bikes}
+print(head(endstationame_by_ridetype %>% 
+             filter(RIDEABLE_TYPE == "electric_bike") %>%  
+             mutate(END_STATION_NAME = reorder(END_STATION_NAME, count)), 20) %>% 
+        ggplot(aes(x = END_STATION_NAME, y = count, fill = RIDEABLE_TYPE)) + 
+        geom_col(position = "stack") + 
+        coord_flip() + 
+        ggtitle(label = "Highest Count of Electric bikes per End Stations" ) + 
+        theme_minimal())
+```
+
+
+
+Now, let's see the relationship between number of user_type and Cyclistic bike end stations
+
+#### Determine the end stations with the highest number of casual or annual users
+
+```{r Create a subset containing the count user_type by end_stations, include=FALSE}
+endstationame_by_usertype <- full_dataset %>% 
+  filter(!is.na(END_STATION_NAME)) %>% 
+  group_by(USERTYPE, END_STATION_NAME) %>% 
+  summarize(count = n()) %>% 
+  arrange(-count)
+```
+
+```{r Filter for the first 20 end_stations having the highest count for casuals}
+print(head(endstationame_by_usertype %>% 
+             filter(USERTYPE == "casual") %>%  
+             mutate(END_STATION_NAME = reorder(END_STATION_NAME, count)),20) %>% 
+        ggplot(aes(x = END_STATION_NAME, y = count, fill = USERTYPE)) + 
+        geom_col(position = "stack") + 
+        coord_flip() + 
+        ggtitle(label = "Highest Count of Casuals per End Stations" ) + 
+        theme_minimal())
+```
+
+```{r Filter for the first 20 end_stations having the highest count for annuals}
+print(head(endstationame_by_usertype %>% 
+             filter(USERTYPE == "member") %>%  
+             mutate(END_STATION_NAME = reorder(END_STATION_NAME, count)), 20) %>% 
+        ggplot(aes(x = END_STATION_NAME, y = count, fill = USERTYPE)) + 
+        geom_col(position = "stack") + 
+        coord_flip() + 
+        ggtitle(label = "Highest Count of Annuals per End Stations" ) + 
+        theme_minimal())
+```
+
+
+Notes: 
+
+1. From the result, we also observe same output with the end stations, having the highest count of classic_bikes, electric_bikes, and docked_bikes with **'Streeter Dr & Grand Ave'**.
+
+2. We also observe, from the plots above, that by comparing the counts of Casuals per end stations, we see that majority of casuals (**> 20,000**) are located closely to end stations where they have high counts of docked bikes. For example, *Streeter Dr & Grand Ave*, *Millennium Park*, *Shedd Aquarium*, *Theather on the Lake*, *Michigan Ave & Oak St*, etc.
+
+3. Similarly, just as with start stations, we observe that by comparing the counts of Annuals per end stations, majority of Annuals (**> 20,000**) are located away from docked_bike end stations, but are found close to end stations with high counts of electric and classic bikes. For example, *Clark St & Elm St.*, *Wells St & Concord Ln*, *Kingsbury St & Kinzie St*, and *Wells St & Elm St*, etc.
+
+    In general, while Casuals are located closely at areas in Chicago where
+    there classic and electric bike stations, a large number of them are found
+    patronizing station where there are high counts of docked bikes.
+
+    Annuals are located closely at areas in Chicago where there are more
+    classic and electric bikes stations, and little to no docked bikes
+    station.
+
+    Hence, this explain one reason why Casuals patronize the use of docked
+    bikes than Annuals.
