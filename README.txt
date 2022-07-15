@@ -4,4 +4,4 @@ import-data.R - imports csv file of 12 months of 2021, Cyclistic trip data to da
 
 wrangle-data.R - creates a derived dataset and saves as R object in rda directory
 
-analyze-data.R - generates various analysis plots and saves it to the figs directory
+analyze-data.R - generates various analysis plots and saves it to the cyclistic_report_files/figure-gfm directory
